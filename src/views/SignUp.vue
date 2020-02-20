@@ -4,7 +4,7 @@
 		<v-form>
 			<v-container>
 				<v-row class="justify-center">
-					<v-col cols="4">
+					<v-col :cols="smallScreen ? '10' : '4'">
 						<v-text-field
 							label="Name"
 							dense
@@ -51,12 +51,18 @@
 							dense
 							label="+38 (0##) ###-##-##"
 							outlined
+							:error-messages="numberErrors"
 							@paste="pasteEvent = true"
-							@input="applyMask($event)"
+							@input="
+								applyMask($event); 
+								$v.numberMask.$touch()
+								"
+							@blur="$v.numberMask.$touch()"
 							v-model="numberMask"
 							id="number"
 						>
 						</v-text-field>
+						<v-btn color="primary" :disabled="isValid">Submit</v-btn>
 					</v-col>
 				</v-row>
 			</v-container>
@@ -75,7 +81,8 @@ import {
 	withUpperCase,
 	vEmailRFC,
 	emailLocal,
-	emailDomain
+	emailDomain,
+	numCharLength
 } from '../validate.js'
 
 export default {
@@ -87,6 +94,27 @@ export default {
 		numberMask: null,
 		pasteEvent: false,
 	}),
+	validations: {
+		name: {
+			nameMnLen,
+			nameMxLen,
+			onlyOneSpace,
+			onlyLatinLetter,
+			onlyOneUpper,
+			withUpperCase
+		},
+		nameMask: {
+			nameMnLen,
+		},
+		emailRFC: {
+			vEmailRFC,
+			emailLocal,
+			emailDomain,
+		},
+		numberMask: {
+			numCharLength,
+		}
+	},
 	computed: {
 		nameErrors() {
 			const errors = []
@@ -112,6 +140,20 @@ export default {
 			!this.$v.emailRFC.emailLocal && errors.push('Local part of email should contain maximum 64 characters')
 			!this.$v.emailRFC.emailDomain && errors.push('Domain part of email should contain maximum 189 character')
 			return errors
+		},
+		numberErrors() {
+			const errors = []
+			if(!this.$v.numberMask.$dirty) return errors
+			!this.$v.numberMask.numCharLength && errors.push('Number should contain 12 digits')
+			return errors
+		},
+		smallScreen() {
+			return this.$vuetify.breakpoint.smAndDown
+		},
+		isValid() {
+			return this.$v.$dirty && !this.$v.$invalid 
+				? false
+				: true
 		}
 	}, 
 	methods: {
@@ -177,7 +219,7 @@ export default {
 			// '#' - is place where the real sign (number character) will be substituted
 			// You can add any other characters between first and last '#' below (exclude numbers)
 			// Also you can edit quantity of '#'
-			const mask = '+38 (0##) - ### - ## - ##'
+			const mask = '+38 (0##) ### - ## - ##'
 			const sign = '#'
 
 			const numLengthRe = /[^#\d+]/g
@@ -237,26 +279,8 @@ export default {
 			this.pasteEvent = false
 		}
 	},
-	validations: {
-		name: {
-			nameMnLen,
-			nameMxLen,
-			onlyOneSpace,
-			onlyLatinLetter,
-			onlyOneUpper,
-			withUpperCase
-		},
-		nameMask: {
-			nameMnLen,
-		},
-		emailRFC: {
-			vEmailRFC,
-			emailLocal,
-			emailDomain,
-		},
-		numberMask: {
-
-		}
+	mounted() {
+		this.isValid
 	}
 }
 </script>

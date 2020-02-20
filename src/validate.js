@@ -40,3 +40,12 @@ export const onlyOneSpace = (val) => {
 export const vEmailRFC = (val) => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*){1,64}|(".+")){1,64}@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val)
 export const emailLocal = (val) => /^\S{1,64}@/.test(val)
 export const emailDomain = (val) => /@\S{0,190}$/.test(val)
+
+export const numCharLength = (val) => {
+	return new Promise((resolve) => {
+		let length = 12
+		if(val !== null) {
+			resolve(val.replace(/[^\d]/g, '').length === length)
+		}
+	}).then(v => {return v})
+}
