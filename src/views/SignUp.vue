@@ -45,6 +45,7 @@
 							v-model="emailRFC"
 							:error-messages="emailRFCErrors"
 							@blur="$v.emailRFC.$touch()"
+							@input="$v.emailRFC.$touch()"
 							>
 						</v-text-field>
 						<v-text-field
