@@ -1,4 +1,4 @@
-// name - validations
+// name
 export const nameMnLen = (val) => {
 	return new Promise((resolve) => {
 		if(val !== null) {
@@ -41,6 +41,7 @@ export const vEmailRFC = (val) => /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\
 export const emailLocal = (val) => /^\S{1,64}@/.test(val)
 export const emailDomain = (val) => /@\S{0,190}$/.test(val)
 
+// number
 export const numCharLength = (val) => {
 	return new Promise((resolve) => {
 		let length = 12
