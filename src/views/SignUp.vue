@@ -14,7 +14,7 @@
 							:error-messages="nameErrors"
 							@input="$v.name.$touch()"
 							@blur="$v.name.$touch()"
-						>
+							>
 						</v-text-field>
 						<v-text-field
 							label="name (Mask)"
@@ -36,7 +36,7 @@
 								replaceCharacters('name-mask'),
 								toUpperCase('name-mask')
 								"
-						>
+							>
 						</v-text-field>
 						<v-text-field
 							label="Email"
@@ -45,7 +45,7 @@
 							v-model="emailRFC"
 							:error-messages="emailRFCErrors"
 							@blur="$v.emailRFC.$touch()"
-						>
+							>
 						</v-text-field>
 						<v-text-field
 							dense
@@ -60,9 +60,42 @@
 							@blur="$v.numberMask.$touch()"
 							v-model="numberMask"
 							id="number"
-						>
+							>
 						</v-text-field>
-						<v-btn color="primary" :disabled="isValid">Submit</v-btn>
+						<v-dialog 
+							persistent
+							v-model="dialog"
+							:max-width="dialogWidth"
+							>
+							<template v-slot:activator="{ on }">
+								<v-btn 
+									v-on="on"
+									color="primary" 
+									:disabled="isValid"
+									@click="compileObj()"
+									>Submit
+								</v-btn>
+							</template>
+								<v-card v-if="objToSend !== null">
+									<v-card-title>
+										Finished object
+									</v-card-title>
+									<v-card-subtitle class="title">
+										Json:
+									</v-card-subtitle>
+									<v-card-text>
+										{{ objToSend }}
+									</v-card-text>
+									<v-card-actions class="justify-center">
+										<v-btn 
+											@click="dialog = false"
+											small
+											color="error"
+											>Close
+										</v-btn>
+									</v-card-actions>
+								</v-card>
+						</v-dialog>
 					</v-col>
 				</v-row>
 			</v-container>
@@ -93,6 +126,8 @@ export default {
 		emailRFC: null,
 		numberMask: null,
 		pasteEvent: false,
+		dialog: false,
+		objToSend: null,
 	}),
 	validations: {
 		name: {
@@ -149,6 +184,9 @@ export default {
 		},
 		smallScreen() {
 			return this.$vuetify.breakpoint.smAndDown
+		},
+		dialogWidth() {
+			return this.smallScreen ? '300' : '650'
 		},
 		isValid() {
 			return this.$v.$dirty && !this.$v.$invalid 
@@ -277,10 +315,15 @@ export default {
 			}
 			
 			this.pasteEvent = false
+		},
+		compileObj() {
+			let object = new Object()
+			object['name'] = this.name
+			object['nameMask'] = this.nameMask
+			object['email'] = this.emailRFC
+			object['number'] = this.numberMask
+			this.objToSend = JSON.stringify(object)
 		}
-	},
-	mounted() {
-		this.isValid
 	}
 }
 </script>
